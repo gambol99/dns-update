@@ -21,31 +21,32 @@ entry = DnsUpdate::Entry.new
 puts "CHECK: adding a host to the domain\n"
 
 entry.hostname = 'yum101.domain.com'
-entry.type = :host
-entry.dest = 'yum'
-entry.address = '192.168.19.120'
+entry.type     = :host
+entry.dest     = 'yum'
+entry.address  = '192.168.19.120'
 dns.add entry
 
 
 puts "CHECK: adding a cname to the domain\n"
 
 entry.hostname = 'yum'
-entry.type = :cname
-entry.dest = 'yum101'
+entry.type     = :cname
+entry.dest     = 'yum101'
 dns.add entry
 
 puts "CHECK: deleting a cname to the domain\n"
 
 entry.hostname = 'yum'
-entry.type = :cname
-entry.dest = 'yum101'
+entry.type     = :cname
+entry.dest     = 'yum101'
 dns.delete entry
 
 puts "CHECK: adding a reverse ip to the domain\n"
 
 entry.hostname = 'yum'
-entry.type = :reverse
-entry.address = '192.168.19.100'
+entry.type     = :reverse
+entry.address  = '192.168.19.100'
+entry.subnet   = '192.168.19.0/24'
 dns.add entry
 
 puts 

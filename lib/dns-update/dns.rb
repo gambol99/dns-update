@@ -49,12 +49,16 @@ class DNS
     @options[:master]
   end
 
-  def nsupdate entry = @entry, print_only = false
+  def nsupdate entry = @entry, print_only = true
     result = @template.result( binding )
-    IO.popen("nsupdate -y #{@options[:key_name]}:#{@options[:secret]} -v", 'r+') do |f|
-      f << result
-      f.close_write
-      puts f.read
+    if print_only 
+      puts result
+    else 
+      IO.popen("nsupdate -y #{@options[:key_name]}:#{@options[:secret]} -v", 'r+') do |f|
+        f << result
+        f.close_write
+        puts f.read
+      end
     end
   end
 

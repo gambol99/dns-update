@@ -4,6 +4,8 @@
 #
 #  vim:ts=2:sw=2:et
 #
+require 'netaddr'
+
 module DnsUpdate
 module Utils
 
@@ -16,10 +18,9 @@ module Utils
   Hostname_Regex   = /^(([[:alnum:]]|[[:alnum:]][a-zA-Z0-9\-]*[[:alnum:]])\.)*([[:alnum:]]|[[:alnum:]][A-Za-z0-9\-]*[[:alnum:]])$/
   Domain_Regex     = /^[[:alnum:]]+([\-\.]{1}[[:alnum:]]+)*\.[[:alpha:]]{2,5}$/
   Types_Regex      = /^(host|cname|reverse)$/
-  IPAddress_Regex  = /^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$/
   Default_Template = <<-EOF
 server <%= @entry[:master] %> 
-zone <%= @entry[:domain] %>
+zone <%= @entry[:zone] %>
 <%- if @entry[:op] == :add -%>
 update add <%= @entry[:hostname] %>.<%=  @entry[:domain] %>. <%= @entry[:ttl] %> <%= @entry[:type] %> <%= @entry[:dest] %>
 <%- else -%>
@@ -28,6 +29,8 @@ update delete <%= @entry[:hostname] %>.<%=  @entry[:domain] %>. <%= @entry[:type
 show 
 send
 EOF
+
+#update add 25.123.168.192.in-addr.arpa. 86400 PTR mail.example.local.
 
   def is_integer value, name = 'value'
     if value.is_a? String
@@ -45,8 +48,21 @@ EOF
     !( domain =~ Domain_Regex ).nil?
   end
 
+  def subnet? address
+    address? address
+  end
+
   def address? address
-    !( address =~ IPAddress_Regex ).nil?
+    begin 
+      NetAddr::CIDR.create address
+      true
+    rescue IPAddr::InvalidAddressError => e 
+      false 
+    end
+  end
+
+  def arpa network
+    NetAddr::CIDR.create( network ).arpa
   end
 
   def type? type 
@@ -57,12 +73,14 @@ EOF
     ( seconds <= 0 ) ? false : true
   end
 
-  def to_arpa ipaddr 
-    ipaddr.split('.').reverse.join('.') << ".in-addr.arpa"
-  end
-
   def record_type type 
     Record_Types[type]
+  end
+
+  def required options, arguments
+    options.each do |x|
+      raise ArgumentError, "you have not specified the #{x} arguments" unless arguments.has_key? x 
+    end
   end
 
   def validate_file filename, writable = false

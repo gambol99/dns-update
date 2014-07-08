@@ -49,7 +49,7 @@ class DNS
     @options[:master]
   end
 
-  def nsupdate entry = @entry, print_only = true
+  def nsupdate entry = @entry, print_only = false
     result = @template.result( binding )
     if print_only 
       puts result

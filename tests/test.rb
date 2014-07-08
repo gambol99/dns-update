@@ -12,7 +12,8 @@ require 'pp'
 options = {
   #:config => './dns.yaml'
   :master     => '192.168.10.10',
-  :rndc_key   => './rndc.key'
+  :key_name   => 'rndc-key',
+  :secret     => './rndc.key'
 }
 
 dns = DnsUpdate::load options
@@ -48,6 +49,14 @@ entry.type     = :reverse
 entry.address  = '192.168.19.100'
 entry.subnet   = '192.168.19.0/24'
 dns.add entry
+
+puts "CHECK: delete a ptr record from domain\n"
+
+entry.hostname = 'yum'
+entry.type     = :reverse
+entry.address  = '192.168.19.100'
+entry.subnet   = '192.168.19.0/24'
+dns.delete entry
 
 puts 
 

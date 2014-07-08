@@ -59,9 +59,11 @@ module DnsUpdate
         model[:dest]      = self.dest << "." << self.domain if operation == :add 
         model[:hostname]  = self.hostname 
       when :reverse
+        # tmpl: update add <%= @entry[:hostname] %>.<%=  @entry[:domain] %>. <%= @entry[:ttl] %> <%= @entry[:type] %> <%= @entry[:dest] %>
+        # update add 254.123.168.192.in-addr.arpa. 38400 PTR gateway.example.local.
         model[:dest]      = self.dest << "." << self.domain 
         model[:hostname]  = arpa( self.address  ).split( '.in-addr.arpa' ).first
-        model[:zone]      = 'in-addr.arpa'
+        model[:zone]      = arpa( self.subnet ) 
       end
       model
     end

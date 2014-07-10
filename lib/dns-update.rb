@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 #
 #   Author: Rohith
 #   Date: 2014-05-31 16:49:01 +0100 (Sat, 31 May 2014)
@@ -6,13 +5,16 @@
 #  vim:ts=2:sw=2:et
 #
 module DnsUpdate
-  ROOT = File.expand_path File.dirname __FILE__
+  def self.path filename 
+    ROOT ||= File.expand_path( File.dirname( __FILE__ ) )
+    "#{ROOT}/dns-update/#{filename}"
+  end
+  require path "version"
 
-  require "#{ROOT}/dns-update/version"
-
-  autoload :Version,    "#{ROOT}/dns-update/version"
-  autoload :Utils,      "#{ROOT}/dns-update/utils"
-  autoload :DNS,        "#{ROOT}/dns-update/dns"
+  autoload :Version, path "version"
+  autoload :Settings, path "settings"
+  autoload :Utils, path "utils"
+  autoload :DNS, path "dns"
 
   def self.version
     DnsUpdate::VERSION
@@ -21,5 +23,4 @@ module DnsUpdate
   def self.load options 
     DnsUpdate::DNS::new( options )
   end
-
 end

@@ -12,7 +12,9 @@ require 'erb'
 
 module DnsUpdate
   class DNS
+    
     include DnsUpdate::Utils
+    include DnsUpdate::Settings
 
     def initialize options
       options = validate_config options

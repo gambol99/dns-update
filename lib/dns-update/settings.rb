@@ -11,6 +11,10 @@ module DnsUpdate
         options[x] || false
       end
     end
+  
+    def options
+      @options
+    end
   end
 end
 

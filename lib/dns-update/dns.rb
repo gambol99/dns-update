@@ -6,100 +6,88 @@
 #
 $:.unshift File.join(File.dirname(__FILE__),'.','./')
 require 'utils'
-require 'entry'
-require 'yaml'
-require 'erb'
+require 'settings'
+require 'nsupdate'
+require 'model'
 
 module DnsUpdate
   class DNS
-    
     include DnsUpdate::Utils
     include DnsUpdate::Settings
+    include DnsUpdate::NsUpdate
 
     def initialize options
-      options = validate_config options
+      @options = validate_config options
     end
 
-    def options
-      @options
+    def update &block
+      raise ArgumentError, "you have not specified a block containing configuration" unless block_given?
+      model = DnsUpdate::Model.load { |x| yield x }
+      model.operation = :update
+      model = send model.operation, model 
     end
 
-    def record hostname, address, attrs
-      check_hostname hostname
-      check_address address
-      attributes = set_attribute_defaults attrs
-      m = model.define {
-        host = hostname
-        address = address
-        ttl = attributes[:ttl]
-      }
-    end
-
-    def cname hostname, destination, attrs
-      check_hostname hostname
-      check_hostname destination
-      attributes = set_attribute_defaults attrs
-
-
-    end
-
-    def reverse hostname, address, subnet, attrs
-      check_hostname hostname
-      check_hostname destination
-      attributes = set_attribute_defaults attrs
-
-
+    def remove &block 
+      raise ArgumentError, "you have not specified a block containing configuration" unless block_given?
+      model = DnsUpdate::Model.load { |x| yield x }
+      model.operation = :remove
+      model = send model.operation, model 
     end
 
     private 
-    def set_attribute_defaults attributes 
+    def set_defaults attributes
       attributes[:ttl] ||= options[:ttl] || 60
       attributes
     end
 
-    def fail message 
-
+    def record model 
+      validate record_required_fields, set_defaults( entry )
+      model = {
+        :type => types[:record],
+        :zone => domain( entry[:hostname] ),
+      }
     end
 
-    def add entry
-      dns_master = validate_entry entry, :add
-      @entry          = entry.model :add
-      @entry[:master] = dns_master 
-      @entry[:op]     = :add
-      nsupdate @entry
+    def cname entry = {}
+      validate cname_required_fields, set_defaults( entry )
+      model = {
+        :type => types[:cname],
+        :zone => domain( entry[:hostname] ),
+        :cname => entry[:cname],
+      }
     end
 
-    def delete entry 
-      dns_master = validate_entry entry, :delete
-      @entry          = entry.model :delete
-      @entry[:master] = dns_master 
-      @entry[:op]     = :delete
-      nsupdate @entry
+    def reverse entry = {}
+      model = validate reverse_required_fields, set_defaults( entry )
+      model = {
+        :type => types[:reverse],
+        :zone => arpa( entry[:subnet] ),
+      }
     end
 
-    def template
-      Default_Template
+    #def nsupdate entry = @entry, print_only = false
+    #  result = @template.result( binding )
+    #  if print_only 
+    #    puts result
+    #  else 
+    #    IO.popen("nsupdate -y #{@options[:key_name]}:#{@options[:secret]} -v", 'r+') do |f|
+    #      f << result
+    #      f.close_write
+    #      puts f.read
+    #    end
+    #  end
+    #end
+
+    def record_required_fields
+      [ :hostname, :address ]
     end
 
-    private
-    def validate_entry entry, operation = :add 
-      # step: check the entry is valid
-      entry.is_valid operation
-      # step: lets get the dns master for this request
-      @options[:master]
+    def cname_required_fields
+      [ :hostname, :cname ]
     end
 
-    def nsupdate entry = @entry, print_only = false
-      result = @template.result( binding )
-      if print_only 
-        puts result
-      else 
-        IO.popen("nsupdate -y #{@options[:key_name]}:#{@options[:secret]} -v", 'r+') do |f|
-          f << result
-          f.close_write
-          puts f.read
-        end
-      end
+    def reverse_required_fields
+      record_required_fields << :subnet
     end
 
     def validate_config options 
@@ -108,8 +96,6 @@ module DnsUpdate
       end
       # step: check the master ip
       raise ArgumentError, "the master should be a valid ip address"  unless address? options[:master]
-      # step: load the template
-      @template = ERB.new( Default_Template, nil, '-' )
       options
     end
   end

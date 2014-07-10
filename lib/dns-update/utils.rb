@@ -8,45 +8,9 @@ require 'netaddr'
 
 module DnsUpdate
   module Utils
+
     Hostname_Regex   = /^(([[:alnum:]]|[[:alnum:]][a-zA-Z0-9\-]*[[:alnum:]])\.)*([[:alnum:]]|[[:alnum:]][A-Za-z0-9\-]*[[:alnum:]])$/
     Domain_Regex     = /^[[:alnum:]]+([\-\.]{1}[[:alnum:]]+)*\.[[:alpha:]]{2,5}$/
-    Default_Template = <<-EOF
-server <%= @entry[:master] %> 
-zone <%= @entry[:zone] %>
-<%- if @entry[:op] == :add -%>
-update add <%= @entry[:hostname] %>.<%=  @entry[:domain] %>. <%= @entry[:ttl] %> <%= @entry[:type] %> <%= @entry[:dest] %>
-<%- else -%>
-update delete <%= @entry[:hostname] %>.<%=  @entry[:domain] %>. <%= @entry[:type] %>
-<%- end -%>
-show 
-send
-EOF
-
-    #update add 25.123.168.192.in-addr.arpa. 86400 PTR mail.example.local.
-    def hostname? hostname
-      !( hostname =~ Hostname_Regex ).nil?
-    end
-
-    def address? address
-      NetAddr::CIDR.create address rescue return false
-      true
-    end
-
-    def destination? destination
-      hostname? destination
-    end
-
-    def subnet? network
-
-    end
-
-    def ttl? ttl 
-
-    end
-
-    def check_ttl ttl 
-      fail "the ttl: #{ttl} is invalid" unless ttl? ttl
-    end
 
     def check_hostname hostname
       fail "the hostname: #{hostname} is invalid" unless hostname? hostname
@@ -60,38 +24,98 @@ EOF
       fail "the destination: #{destination} is invalid" unless hostname? destination
     end
 
-    def integer? int 
-      if int.is_a? String
-        raise ArgumentError, "the #{name}: #{seconds} is invalid; must be numeric"  unless int =~ /^[[:digit:]]+$/
-        int = int.to_i  
-      end
-      int
+    def check_subnet network
+      fail "the subnet: #{network} is invalid" unless subnet? network
+    end
+
+    def check_ttl ttl 
+      fail "the ttl: #{ttl} is invalid" unless ttl? ttl
+    end
+
+    def fail message
+      raise ArgumentError, message
+    end
+
+    def ttl? timetolive
+      true
+    end
+
+    def hostname? hostname
+      hostname =~ Hostname_Regex
+    end
+
+    def address? address
+      NetAddr::CIDR.create address rescue return false
+      true
+    end
+
+    def destination? destination
+      hostname? destination
+    end
+
+    def domain fqdn
+      fqdn[fqdn.index('.')+1..-1]
+    end
+
+    def arpa network 
+      check_subnet network
+      parse_address( network ).arpa.gsub!( /\.$/,'' )
+    end
+
+    def subnet? network 
+      (parse_address( network ).netmask_ext =~ /^(255\.){3}255$/ ).nil?
     end
 
     def types 
-      %(cname a ptr svr)
+      {
+        :record => "A",
+        :cname  => "CNAME",
+        :reverse => "PTR",
+        :service => "SRV"
+      }
     end
 
     def type? type 
-      types.include? type
-    end
-
-    def domain? domain 
-      !( domain =~ Domain_Regex ).nil?
+      types.has_key? type
     end
 
     def arpa network
       NetAddr::CIDR.create( network ).arpa
     end
 
-    def ttl? ttl
-      ( seconds <= 0 ) ? false : true
-    end
-
     def required options, arguments
       options.each do |x|
-        fail "you have not specified the #{x} arguments" unless arguments.has_key? x 
+        fail "you have not specified the #{x} argument" unless arguments.has_key? x 
       end
+    end
+
+    def parse_address ipaddr
+      begin 
+        NetAddr::CIDR.create ipaddr
+      rescue NetAddr::ValidationError => e 
+        raise e.message
+      end
+    end 
+
+    def validate options, arguments
+      required options, arguments
+      model = {}
+      arguments.each_pair do |k,v|
+        case k 
+        when :hostname
+          check_hostname v
+        when :address
+          check_address v
+        when :subnet
+          check_subnet v
+        when :cname
+          check_hostname v
+        when :ttl 
+          check_ttl v
+        end
+        model[k] = v
+      end
+      model
     end
 
     def validate_file filename, writable = false

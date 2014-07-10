@@ -5,22 +5,24 @@
 #  vim:ts=2:sw=2:et
 #
 module DnsUpdate
+  ROOT = File.expand_path( File.dirname( __FILE__ ) )
+
   def self.path filename 
-    ROOT ||= File.expand_path( File.dirname( __FILE__ ) )
     "#{ROOT}/dns-update/#{filename}"
   end
+  
   require path "version"
 
-  autoload :Version, path "version"
-  autoload :Settings, path "settings"
-  autoload :Utils, path "utils"
-  autoload :DNS, path "dns"
+  autoload :Version, path( "version" )
+  autoload :Settings, path( "settings" )
+  autoload :Utils, path( "utils" )
+  autoload :DNS, path( "dns" )
 
   def self.version
     DnsUpdate::VERSION
   end 
 
   def self.load options 
-    DnsUpdate::DNS::new( options )
+    DnsUpdate::DNS.new( options )
   end
 end

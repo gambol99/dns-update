@@ -67,11 +67,6 @@ module DnsUpdate
       fqdn[fqdn.index('.')+1..-1]
     end
 
-    def arpa network 
-      check_subnet network
-      parse_address( network ).arpa
-    end
-
     def subnet? network 
       (parse_address( network ).netmask_ext =~ /^(255\.){3}255$/ ).nil?
     end
@@ -90,7 +85,7 @@ module DnsUpdate
     end
 
     def arpa network
-      NetAddr::CIDR.create( network ).arpa
+      NetAddr::CIDR.create( network ).arpa.gsub( /\.$/, '' ).chomp
     end
 
     def parse_address ipaddr

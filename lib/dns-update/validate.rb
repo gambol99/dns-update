@@ -27,6 +27,7 @@ module DnsUpdate
       check_address model.address
       check_subnet model.subnet
       model.zone = arpa model.subnet
+      model.address = arpa model.address
       model
     end
 
@@ -43,9 +44,10 @@ module DnsUpdate
     end
 
     def validate_remove_reverse model 
-      check_address model.address
+      check_address model.address 
       check_subnet model.subnet
       model.zone = arpa model.subnet
+      model.address = arpa model.address
       model
     end
 

@@ -15,19 +15,19 @@ server <%= @master %>
 zone <%= @model.zone -%>.
 <%- if @model.operation == :update -%>
   <%- if @model.type == 'A' -%>
-update add <%= @model.hostname %> <%= @model.ttl %> <%= @model.type %> <%= @model.address %>
+update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> <%= @model.address %>
   <%- elsif @model.type == 'CNAME' -%>
-update add <%= @model.hostname %> <%= @model.ttl %> <%= @model.type %> <%= @model.cname %>          
+update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> <%= @model.cname %>          
   <%- elsif @model.type == 'PTR' -%> 
-update add <%= @model.hostname %> <%= @model.ttl %> <%= @model.type %> <%= @model.address %>                  
+update add <%= @model.address %> <%= @model.ttl %> <%= @model.type %> <%= @model.hostname %>                  
   <%- end -%>
 <%- else -%>
   <%- if @model.type == 'A' -%>
-update delete <%= @model.hostname %> IN <%= @model.type %>
+update delete <%= @model.hostname %>. <%= @model.type %>
   <%- elsif @model.type == 'CNAME' -%>
-update delete <%= @model.hostname %> IN <%= @model.type %>        
+update delete <%= @model.hostname %>. <%= @model.type %>        
   <%- elsif @model.type == 'PTR' -%>
-update delete <%= @model.address %> <%= @model.type %>        
+update delete <%= @model.address %>. <%= @model.type %>        
   <%- end -%>
 <%- end -%>
 show 

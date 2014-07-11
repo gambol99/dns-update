@@ -13,23 +13,33 @@ module DnsUpdate
     Domain_Regex     = /^[[:alnum:]]+([\-\.]{1}[[:alnum:]]+)*\.[[:alpha:]]{2,5}$/
 
     def check_hostname hostname
-      fail "the hostname: #{hostname} is invalid" unless hostname? hostname
+      fail "you have not specified the hostname" unless hostname
+      fail "the hostname: #{hostname || 'nil'} is invalid" unless hostname? hostname
+    end
+
+    def check_cname hostname
+      fail "you have not specified the cname" unless hostname
+      fail "the cname: #{hostname || 'nil'} is invalid" unless hostname? hostname
     end
 
     def check_address address
+      fail "you have not specified the address" unless address
       fail "the address: #{address} is invalid" unless address? address
     end
 
-    def check_destination destination
-      fail "the destination: #{destination} is invalid" unless hostname? destination
-    end
-
     def check_subnet network
+      fail "you have not specified the subnet" unless network
       fail "the subnet: #{network} is invalid" unless subnet? network
     end
 
     def check_ttl ttl 
       fail "the ttl: #{ttl} is invalid" unless ttl? ttl
+    end
+
+    def check_type type 
+      raise ArgumentError, "you have not specified a dns type (supported types: #{types.keys.join(', ')}" unless type
+      raise ArgumentError, "the type: #{type} is not supported" unless type? type 
+      types[type]
     end
 
     def fail message
@@ -59,7 +69,7 @@ module DnsUpdate
 
     def arpa network 
       check_subnet network
-      parse_address( network ).arpa.gsub!( /\.$/,'' )
+      parse_address( network ).arpa
     end
 
     def subnet? network 
@@ -83,12 +93,6 @@ module DnsUpdate
       NetAddr::CIDR.create( network ).arpa
     end
 
-    def required options, arguments
-      options.each do |x|
-        fail "you have not specified the #{x} argument" unless arguments.has_key? x 
-      end
-    end
-
     def parse_address ipaddr
       begin 
         NetAddr::CIDR.create ipaddr
@@ -96,27 +100,6 @@ module DnsUpdate
         raise e.message
       end
     end 
-
-    def validate options, arguments
-      required options, arguments
-      model = {}
-      arguments.each_pair do |k,v|
-        case k 
-        when :hostname
-          check_hostname v
-        when :address
-          check_address v
-        when :subnet
-          check_subnet v
-        when :cname
-          check_hostname v
-        when :ttl 
-          check_ttl v
-        end
-        model[k] = v
-      end
-      model
-    end
 
     def validate_file filename, writable = false
       raise ArgumentError, 'you have not specified a file to check'       unless filename

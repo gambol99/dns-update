@@ -30,58 +30,37 @@ dns.update { |m|
 }
 
 #announce "CHECK: adding a cname to the domain"
-#dns.cname(
-#  :hostname => "yum.domain.com",
-#  :cname  => "yum101.domain.com"
-#) 
+#dns.update { |m|
+#  m.type = :cname
+#  m.hostname = "yum.domain.com"
+#  m.cname = "yum101.domain.com"
+#}
 #
 #announce "CHECK: adding a reverse to the domain"
-#dns.reverse(
-#  :hostname => "yum.domain.com",
-#  :address  => "192.168.19.20",
-#  :subnet  => "192.168.19.0/24"
-#)
+#dns.update { |m|
+#  m.type = :reverse
+#  m.hostname = "yum.domain.com"
+#  m.address = "192.168.19.20"
+#  m.subnet = "192.168.19.0/24"
+#}
 
-#entry.hostname = 'yum101.domain.com'
-#entry.type     = :host
-#entry.dest     = 'yum'
-#entry.address  = '192.168.19.120'
-#dns.add entry
-#
-#
-#puts "CHECK: adding a cname to the domain\n"
-#
-#entry.hostname = 'yum'
-#entry.type     = :cname
-#entry.dest     = 'yum101'
-#dns.add entry
-#
-#puts "CHECK: deleting a cname to the domain\n"
-#
-#entry.hostname = 'yum'
-#entry.type     = :cname
-#entry.dest     = 'yum101'
-#dns.delete entry
-#
-#puts "CHECK: adding a reverse ip to the domain\n"
-#
-#entry.hostname = 'yum'
-#entry.type     = :reverse
-#entry.address  = '192.168.19.100'
-#entry.subnet   = '192.168.19.0/24'
-#dns.add entry
-#
-#puts "CHECK: delete a ptr record from domain\n"
-#
-#entry.hostname = 'yum'
-#entry.type     = :reverse
-#entry.address  = '192.168.19.100'
-#entry.subnet   = '192.168.19.0/24'
-#dns.delete entry
+# REMOVAL
+announce "CHECK: removing a host to the domain"
+dns.remove { |m|
+  m.type = :record
+  m.hostname = "yum101.domain.com"
+}
 
-puts 
-
-
-
-
-
+#announce "CHECK: removing a cname to the domain"
+#dns.remove { |m|
+#  m.type = :cname
+#  m.hostname = "yum.domain.com"
+#}
+#
+#announce "CHECK: removing a reverse to the domain"
+#dns.remove { |m|
+#  m.type = :reverse
+#  m.hostname = "yum.domain.com"
+#  m.address = "192.168.19.20"
+#  m.subnet = "192.168.19.0/24"
+#}

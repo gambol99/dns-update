@@ -10,34 +10,61 @@ require 'pp'
 
 module DnsUpdate
   module NsUpdate
-
     Default_Template = <<-EOF
-      server <%= @entry[:master] %> 
-      zone <%= @entry[:zone] %>
-      <%- if @entry[:op] == :add -%>
-      update add <%= @entry[:hostname] %>.<%=  @entry[:domain] %>. <%= @entry[:ttl] %> <%= @entry[:type] %> <%= @entry[:dest] %>
-      <%- else -%>
-      update delete <%= @entry[:hostname] %>.<%=  @entry[:domain] %>. <%= @entry[:type] %>
-      <%- end -%>
-      show 
-      send
-      EOF
+server <%= @master %>
+zone <%= @model.zone -%>.
+<%- if @model.operation == :update -%>
+  <%- if @model.type == 'A' -%>
+update add <%= @model.hostname %> <%= @model.ttl %> <%= @model.type %> <%= @model.address %>
+  <%- elsif @model.type == 'CNAME' -%>
+update add <%= @model.hostname %> <%= @model.ttl %> <%= @model.type %> <%= @model.cname %>          
+  <%- elsif @model.type == 'PTR' -%> 
+update add <%= @model.hostname %> <%= @model.ttl %> <%= @model.type %> <%= @model.address %>                  
+  <%- end -%>
+<%- else -%>
+  <%- if @model.type == 'A' -%>
+update delete <%= @model.hostname %> IN <%= @model.type %>
+  <%- elsif @model.type == 'CNAME' -%>
+update delete <%= @model.hostname %> IN <%= @model.type %>        
+  <%- elsif @model.type == 'PTR' -%>
+update delete <%= @model.address %> <%= @model.type %>        
+  <%- end -%>
+<%- end -%>
+show 
+send
+EOF
+
 
     def nsupdate model 
-      PP.pp model
+      puts render_update model 
 
+      #result = @template.result( binding )
+      #if print_only 
+      #  puts result
+      #else 
+      #  IO.popen("nsupdate -y #{@options[:key_name]}:#{@options[:secret]} -v", 'r+') do |f|
+      #    f << result
+      #    f.close_write
+      #    puts f.read
+      #  end
+      #end
     end
 
     private 
 
+    def render_update model
+      @model  = model 
+      @master = settings[:master]
+      ERB.new( template, nil, '-' ).result( binding ) 
+    end
+
     def template
-      options[:template] || default_template
+      settings[:template] || default_template
     end
 
     def default_template
       Default_Template
     end
-
   end
 end
 

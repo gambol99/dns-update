@@ -12,7 +12,7 @@ module DnsUpdate
   module NsUpdate
     Default_Template = <<-EOF
 server <%= @master %>
-zone <%= @model.zone -%>.
+zone <%= @model.zone %>.
 <%- if @model.operation == :update -%>
   <%- if @model.type == 'A' -%>
 update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> <%= @model.address %>

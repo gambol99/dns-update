@@ -1,0 +1,142 @@
+#!/usr/bin/env ruby
+#
+#   Author: Rohith (gambol99@gmail.com)
+#   Date: 2014-07-11 12:07:24 +0100 (Fri, 11 Jul 2014)
+#
+#  vim:ts=4:sw=4:et
+#
+$:.unshift File.join(File.dirname(__FILE__),'.','../lib')
+require 'optionscrapper'
+require 'dns-update'
+require 'colorize'
+require 'yaml'
+require 'pp'
+
+module DnsUpdate
+  class CLI
+
+    def initialize
+      parser.parse!
+      begin 
+        # step: load any configuration file
+        load_configuration options[:config] if options[:config]
+        # step: check we have everything we need
+        validate_configuraion if options[:operation]
+        # step: perform the operation if we have one
+        send options[:operation] if options[:operation]
+      rescue Exception => e 
+        parser.usage e.message
+      end
+    end
+
+    private 
+    def update 
+      verbose "performing a update"
+      dns.update { |m|
+        available_options.each do |x|
+          m.send "#{x}=", options[x] if options[x]
+        end
+        m.type = type( options[:type] )
+      }
+    end
+
+    def remove
+      puts "performing a removal"
+      dns.remove { |m|
+        available_options.each do |x|
+          m.send "#{x}=", options[x] if options[x]
+        end
+        m.type = type( options[:type] )
+      }
+    end
+
+    def parser 
+      @parser ||= OptionScrapper.new do |o|
+        o.on( nil, '--dry-run', 'perform a dry and print to screen' ) { options[:print_only] = true }
+        o.on( '-c FILE', '--config FILE', 'the file contain the dns config' ) { |x| options[:config] = x }
+        o.on( nil, '--master ADDRESS', 'ip address of the master' ) { |x| options[:master] = x }
+        o.on( nil, '--key NAME', 'the name of the dns key' ) { |x| options[key] = x }
+        o.on( nil, '--secret TOKEN', 'the dns key token' ) { |x| options[:secret] = x }
+        o.on( '-v', '--verbose', 'switch on verbose mode' ) { options[:verbose] = true }
+        o.command :update, 'perform an update to the dns domain' do 
+          o.on( '-t TYPE', '--type TYPE', "the record type being added (types: #{types.join(',')}" ) { |x| options[:type] = x }
+          o.on( '-H HOSTNAME', '--hostname HOSTNAME', 'the hostname you wish to add' ) { |x| options[:hostname] = x }
+          o.on( '-i ADDRESS', '--address ADDRESS', 'the ip address of the hostname' ) { |x| options[:address] = x } 
+          o.on( '-s SUBNET', '--subnet SUBNET', 'the subnet of the hostname' ) { |x| options[:subnet] = x }
+          o.on( '-c HOSTNAME', '--cname HOSTNAME', 'the cname of the record' ) { |x| options[:cname] = x }
+          o.on( nil, '--ttl TTL', 'the time to live for the record' ) { options[:ttl] = x }
+          o.on_command { options[:operation] = :update }
+        end
+        o.command :remove, 'perform a removal from the dns domain' do 
+          o.on( '-t TYPE', '--type TYPE', "the record type being added (types: #{types.join(',')}" ) { |x| options[:type] = x }
+          o.on( '-H HOSTNAME', '--hostname HOSTNAME', 'the hostname you wish to add' ) { |x| options[:hostname] = x }
+          o.on( '-i ADDRESS', '--address ADDRESS', 'the ip address of the hostname' ) { |x| options[:address] = x } 
+          o.on( '-s SUBNET', '--subnet SUBNET', 'the subnet of the hostname' ) { |x| options[:subnet] = x }
+          o.on( nil, '--ttl TTL', 'the time to live for the record' ) { options[:ttl] = x }
+          o.on_command { options[:operation] = :remove }
+        end
+      end
+    end
+
+    def options 
+      @options ||= default_options
+    end
+
+    def default_options 
+      { :print_only => true, :config => '.config.yaml' }
+    end
+
+    def dns 
+      @dns ||= DnsUpdate::load options 
+    end
+
+    def verbose message
+      puts "[verbose] : ".green << message if options[:verbose]
+    end
+
+    def load_configuration filename 
+      validate_file filename
+      if File.exists? filename
+        data = YAML.load(File.read(filename)) 
+        %w(master key_name secret).each do |x|
+          options[x.to_sym] = data[x] if data.has_key? x and !options[x]
+        end
+      end
+    end
+
+    def validate_configuraion 
+      [ :key_name, :secret, :master ].each do |x|
+        raise ArgumentError, "you have not specified the '#{x}'' option in either configuration of arguments" unless options.has_key? x
+      end
+      verbose "master: #{options[:master]}, key_name: #{options[:key_name]}"
+    end
+
+    def available_options 
+      [ :hostname, :address, :subnet, :type, :ttl, :cname ]
+    end
+
+    def validate_file filename
+      raise ArgumentError, 'you have not specified a file to check' unless filename
+      if File.exists? filename
+        raise ArgumentError, 'the file: %s is not a file'    % [ filename ]  unless File.file? filename
+        raise ArgumentError, 'the file: %s is not readable'  % [ filename ]  unless File.readable? filename
+      end
+      filename
+    end
+
+    def available_types 
+      {
+        'a' => :record,
+        'cname' => :cname,
+        'ptr' => :reverse,
+        'srv' => :service
+      }
+    end
+
+    def types; available_types.keys; end
+    def type x; available_types[x];  end
+    def type? type; types.include? type; end
+  end
+end
+
+DnsUpdate::CLI.new 

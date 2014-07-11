@@ -5,6 +5,5 @@
 #  vim:ts=2:sw=2:et
 #
 module DnsUpdate
-  VERSION = "0.0.2"
-  AUTHOR  = "Rohith Jayawardene"
+  VERSION = "0.0.5"
 end

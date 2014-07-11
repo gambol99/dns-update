@@ -59,7 +59,7 @@ module DnsUpdate
         o.on( nil, '--secret TOKEN', 'the dns key token' ) { |x| options[:secret] = x }
         o.on( '-v', '--verbose', 'switch on verbose mode' ) { options[:verbose] = true }
         o.command :update, 'perform an update to the dns domain' do 
-          o.on( '-t TYPE', '--type TYPE', "the record type being added (types: #{types.join(',')}" ) { |x| options[:type] = x }
+          o.on( '-t TYPE', '--type TYPE', "the record type being added (types: #{types.join(',')})" ) { |x| options[:type] = x }
           o.on( '-H HOSTNAME', '--hostname HOSTNAME', 'the hostname you wish to add' ) { |x| options[:hostname] = x }
           o.on( '-i ADDRESS', '--address ADDRESS', 'the ip address of the hostname' ) { |x| options[:address] = x } 
           o.on( '-s SUBNET', '--subnet SUBNET', 'the subnet of the hostname' ) { |x| options[:subnet] = x }
@@ -68,7 +68,7 @@ module DnsUpdate
           o.on_command { options[:operation] = :update }
         end
         o.command :remove, 'perform a removal from the dns domain' do 
-          o.on( '-t TYPE', '--type TYPE', "the record type being added (types: #{types.join(',')}" ) { |x| options[:type] = x }
+          o.on( '-t TYPE', '--type TYPE', "the record type being added (types: #{types.join(',')})" ) { |x| options[:type] = x }
           o.on( '-H HOSTNAME', '--hostname HOSTNAME', 'the hostname you wish to add' ) { |x| options[:hostname] = x }
           o.on( '-i ADDRESS', '--address ADDRESS', 'the ip address of the hostname' ) { |x| options[:address] = x } 
           o.on( '-s SUBNET', '--subnet SUBNET', 'the subnet of the hostname' ) { |x| options[:subnet] = x }

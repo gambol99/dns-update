@@ -33,21 +33,17 @@ update delete <%= @model.address %>. <%= @model.type %>
 show 
 send
 EOF
-
-
     def nsupdate model 
-      puts render_update model 
-
-      #result = @template.result( binding )
-      #if print_only 
-      #  puts result
-      #else 
-      #  IO.popen("nsupdate -y #{@options[:key_name]}:#{@options[:secret]} -v", 'r+') do |f|
-      #    f << result
-      #    f.close_write
-      #    puts f.read
-      #  end
-      #end
+      render = render_update model 
+      if !model.print_only && !settings[:print_only]
+        status = IO.popen("nsupdate -y #{settings[:key_name]}:#{settings[:secret]} -v", 'r+') do |f|
+          f << render
+          f.close_write
+          puts f.read
+        end        
+      else 
+        puts render
+      end
     end
 
     private 

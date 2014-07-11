@@ -15,9 +15,10 @@ def announce message
 end
 
 options = {
-  :master     => '192.168.10.10',
+  :master     => '192.168.10.12',
   :key_name   => 'rndc-key',
-  :secret     => './rndc.key'
+  :secret     => './rndc.key',
+  :print_only => true
 }
 
 dns = DnsUpdate::load options

@@ -52,7 +52,6 @@ module DnsUpdate
     end
 
     def set_defaults model
-      PP.pp model
       model.ttl = ( settings[:ttl] || 60 ) unless model.ttl
       model
     end

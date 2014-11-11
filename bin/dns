@@ -31,7 +31,7 @@ module DnsUpdate
 
     private 
     def update 
-      verbose "performing a update"
+      verbose 'performing a update'
       dns.update { |m|
         available_options.each do |x|
           m.send "#{x}=", options[x] if options[x]
@@ -41,7 +41,7 @@ module DnsUpdate
     end
 
     def remove
-      puts "performing a removal"
+      puts 'performing a removal'
       dns.remove { |m|
         available_options.each do |x|
           m.send "#{x}=", options[x] if options[x]
@@ -90,14 +90,14 @@ module DnsUpdate
       @dns ||= DnsUpdate::load options 
     end
 
-    def verbose message
-      puts "[verbose] : ".green << message if options[:verbose]
+    def verbose(message)
+      puts '[verbose] : '.green << message if options[:verbose]
     end
 
-    def load_configuration filename 
+    def load_configuration(filename)
       validate_file filename
       if File.exists? filename
-        data = YAML.load(File.read(filename)) 
+        data = YAML.load(File.read(filename))
         %w(master key_name secret).each do |x|
           options[x.to_sym] = data[x] if data.has_key? x and !options[x]
         end
@@ -115,11 +115,11 @@ module DnsUpdate
       [ :hostname, :address, :subnet, :type, :ttl, :cname ]
     end
 
-    def validate_file filename
+    def validate_file(filename)
       raise ArgumentError, 'you have not specified a file to check' unless filename
       if File.exists? filename
-        raise ArgumentError, 'the file: %s is not a file'    % [ filename ]  unless File.file? filename
-        raise ArgumentError, 'the file: %s is not readable'  % [ filename ]  unless File.readable? filename
+        raise ArgumentError, 'the file: %s is not a file' % [filename] unless File.file? filename
+        raise ArgumentError, 'the file: %s is not readable' % [filename] unless File.readable? filename
       end
       filename
     end
@@ -134,8 +134,12 @@ module DnsUpdate
     end
 
     def types; available_types.keys; end
-    def type x; available_types[x];  end
-    def type? type; types.include? type; end
+    def type(x);
+      available_types[x];
+    end
+    def type?(type);
+      types.include? type;
+    end
   end
 end
 

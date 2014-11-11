@@ -18,12 +18,12 @@ module DnsUpdate
     include DnsUpdate::NsUpdate
     include DnsUpdate::Validate
 
-    def initialize options
+    def initialize(options)
       @settings = validate_config options
     end
 
-    def update &block 
-      raise ArgumentError, "you have not specified a block containing configuration" unless block_given?
+    def update(&block)
+      raise ArgumentError, 'you have not specified a block containing configuration' unless block_given?
       # step: load the dns entry model from the client
       model = DnsUpdate::Model.load { |x| yield x }
       # step: set the operation 
@@ -32,8 +32,8 @@ module DnsUpdate
       perform model
     end
 
-    def remove &block 
-      raise ArgumentError, "you have not specified a block containing configuration" unless block_given?
+    def remove(&block)
+      raise ArgumentError, 'you have not specified a block containing configuration' unless block_given?
       # step: load the dns entry model from the client
       model = DnsUpdate::Model.load { |x| yield x }
       # step: set the operation 
@@ -43,13 +43,13 @@ module DnsUpdate
     end
 
     private
-    def perform model 
+    def perform(model)
       # step: insert any defaults
-      model = set_defaults model 
+      model = set_defaults model
       # step: check a type has been specified
       check_type model.type
       # step: call the validation code on the dns entry type
-      send "validate_#{model.operation}_#{model.type}", model 
+      send "validate_#{model.operation}_#{model.type}", model
       # step: set the type if not there
       model.type = check_type model.type
       # step: call the dns update 

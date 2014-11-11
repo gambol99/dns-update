@@ -33,25 +33,25 @@ update delete <%= @model.address %>. <%= @model.type %>
 show 
 send
 EOF
-    def nsupdate model 
-      render = render_update model 
+    def nsupdate(model)
+      render = render_update model
       if !model.print_only && !settings[:print_only]
         status = IO.popen("nsupdate -y #{settings[:key_name]}:#{settings[:secret]} -v", 'r+') do |f|
           f << render
           f.close_write
           puts f.read
-        end        
-      else 
+        end
+      else
         puts render
       end
     end
 
     private 
 
-    def render_update model
-      @model  = model 
+    def render_update(model)
+      @model = model
       @master = settings[:master]
-      ERB.new( template, nil, '-' ).result( binding ) 
+      ERB.new(template, nil, '-').result(binding)
     end
 
     def template

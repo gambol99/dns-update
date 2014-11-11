@@ -7,8 +7,8 @@
 module DnsUpdate
   module Settings
     [ :verbose, :debug ].each do |x|
-      define_method "#{x}" do 
-        options[x] || false
+      define_method "#{x}" do
+        options[x]
       end
     end
   
@@ -16,12 +16,12 @@ module DnsUpdate
       @settings
     end
 
-    def validate_config options 
-      [ :master, :key_name, :secret ].each do |x| 
-        raise ArgumentError, "you have not specified the #{x} option"  unless options.has_key? x 
+    def validate_config(options)
+      [:master, :key_name, :secret].each do |x|
+        raise ArgumentError, "you have not specified the #{x} option" unless options.has_key? x
       end
       # step: check the master ip
-      raise ArgumentError, "the master should be a valid ip address"  unless address? options[:master]
+      raise ArgumentError, 'the master should be a valid ip address' unless address? options[:master]
       options
     end
   end

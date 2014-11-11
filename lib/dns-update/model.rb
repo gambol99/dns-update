@@ -14,7 +14,7 @@ module DnsUpdate
       @print_only = false
     end
 
-    def self.load &block
+    def self.load(&block)
       model = Model.new
       yield model
       model

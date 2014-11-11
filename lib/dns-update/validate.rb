@@ -6,23 +6,23 @@
 #
 module DnsUpdate
   module Validate
-    def validate_update_record model
+    def validate_update_record(model)
       check_hostname model.hostname
       check_address model.address
       check_ttl model.ttl
-      model.zone = domain( model.hostname )
+      model.zone = domain(model.hostname)
       model
     end
 
-    def validate_update_cname model
+    def validate_update_cname(model)
       check_hostname model.hostname
       check_cname model.cname
       check_ttl model.ttl
-      model.zone = domain( model.hostname )
+      model.zone = domain(model.hostname)
       model
     end
 
-    def validate_update_reverse model
+    def validate_update_reverse(model)
       check_hostname model.hostname
       check_address model.address
       check_subnet model.subnet
@@ -31,19 +31,19 @@ module DnsUpdate
       model
     end
 
-    def validate_remove_record model
+    def validate_remove_record(model)
       check_hostname model.hostname
-      model.zone = domain( model.hostname )
+      model.zone = domain(model.hostname)
       model
     end
 
-    def validate_remove_cname model
+    def validate_remove_cname(model)
       check_hostname model.hostname
-      model.zone = domain( model.hostname )
+      model.zone = domain(model.hostname)
       model
     end
 
-    def validate_remove_reverse model
+    def validate_remove_reverse(model)
       check_address model.address
       check_subnet model.subnet
       model.zone = arpa model.subnet
@@ -51,8 +51,8 @@ module DnsUpdate
       model
     end
 
-    def set_defaults model
-      model.ttl = ( settings[:ttl] || 60 ) unless model.ttl
+    def set_defaults(model)
+      model.ttl = (settings[:ttl] || 60) unless model.ttl
       model
     end
   end

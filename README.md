@@ -1,3 +1,5 @@
+[![Build Status](https://drone.io/github.com/gambol99/dns-update/status.png)](https://drone.io/github.com/gambol99/dns-update/latest)
+
 DNS Update
 -----------
 

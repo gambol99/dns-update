@@ -7,11 +7,10 @@
 #
 $:.unshift File.join(File.dirname(__FILE__),'.','../lib')
 require 'dns-update'
-require 'colorize'
 require 'pp'
 
 def announce(message)
-  puts "\n ** ".red << message.green << "\n\n"
+  puts "\n ** " << message << "\n\n"
 end
 
 options = {

@@ -29,6 +29,15 @@ dns.update { |m|
   m.address = '192.168.19.20'
   m.ttl = 100
 }
+
+announce 'CHECK: adding a host with leading _ to the domain'
+dns.update { |m|
+  m.type = :record
+  m.hostname = '_yum101.dasblinkenled.org'
+  m.address = '192.168.19.20'
+  m.ttl = 100
+}
+
 announce 'CHECK: adding a cname to the domain'
 dns.update { |m|
   m.type = :cname

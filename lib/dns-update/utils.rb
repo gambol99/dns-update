@@ -9,7 +9,7 @@ require 'netaddr'
 module DnsUpdate
   module Utils
 
-    Hostname_Regex   = /^(([[:alnum:]]|[[:alnum:]][a-zA-Z0-9\-]*[[:alnum:]])\.)*([[:alnum:]]|[[:alnum:]][A-Za-z0-9\-]*[[:alnum:]])$/
+    Hostname_Regex   = /^(([_[[:alnum:]]]|[_[[:alnum:]]][_a-zA-Z0-9\-]*[[:alnum:]])\.)*([[:alnum:]]|[[:alnum:]][_A-Za-z0-9\-]*[[:alnum:]])$/
     Domain_Regex     = /^[[:alnum:]]+([\-\.]{1}[[:alnum:]]+)*\.[[:alpha:]]{2,5}$/
 
     def check_hostname(hostname)

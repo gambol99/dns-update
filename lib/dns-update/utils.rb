@@ -55,7 +55,15 @@ module DnsUpdate
     end
 
     def address?(address)
-      NetAddr::CIDR.create address rescue return false
+      begin
+        NetAddr::IPv6.parse address
+      rescue NetAddr::ValidationError
+        begin
+          NetAddr::IPv4.parse address
+        rescue NetAddr::ValidationError
+          return false
+        end
+      end
       true
     end
 
@@ -85,16 +93,16 @@ module DnsUpdate
     end
 
     def arpa(network)
-      NetAddr::CIDR.create(network).arpa.gsub(/\.$/, '').chomp
+      NetAddr::IPv4Net.parse(network).arpa.gsub(/\.$/, '').chomp
     end
 
     def parse_address(ipaddr)
       begin
-        NetAddr::CIDR.create ipaddr
+        NetAddr::IPv4Net.parse ipaddr
       rescue NetAddr::ValidationError => e
         raise e.message
       end
-    end 
+    end
 
     def validate_file(filename, writable = false)
       raise ArgumentError, 'you have not specified a file to check' unless filename

@@ -27,6 +27,10 @@ module DnsUpdate
       fail "the address: #{address} is invalid" unless address? address
     end
 
+    def check_txt(data)
+      fail 'you have not specified the data for the txt' unless data
+    end
+
     def check_subnet(network)
       fail 'you have not specified the subnet' unless network
       fail "the subnet: #{network} is invalid" unless subnet? network
@@ -79,12 +83,13 @@ module DnsUpdate
       (parse_address(network).netmask_ext =~ /^(255\.){3}255$/).nil?
     end
 
-    def types 
+    def types
       {
         :record => 'A',
         :cname  => 'CNAME',
         :reverse => 'PTR',
-        :service => 'SRV'
+        :service => 'SRV',
+        :txt     => 'TXT'
       }
     end
 

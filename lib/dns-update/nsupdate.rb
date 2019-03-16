@@ -17,20 +17,24 @@ zone <%= @model.zone %>.
   <%- if @model.type == 'A' -%>
 update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> <%= @model.address %>
   <%- elsif @model.type == 'CNAME' -%>
-update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> <%= @model.cname %>          
-  <%- elsif @model.type == 'PTR' -%> 
-update add <%= @model.address %> <%= @model.ttl %> <%= @model.type %> <%= @model.hostname %>                  
+update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> <%= @model.cname %>
+  <%- elsif @model.type == 'TXT' -%>
+update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> "<%= @model.data %>"
+  <%- elsif @model.type == 'PTR' -%>
+update add <%= @model.address %> <%= @model.ttl %> <%= @model.type %> <%= @model.hostname %>
   <%- end -%>
 <%- else -%>
   <%- if @model.type == 'A' -%>
 update delete <%= @model.hostname %>. <%= @model.type %>
   <%- elsif @model.type == 'CNAME' -%>
-update delete <%= @model.hostname %>. <%= @model.type %>        
+update delete <%= @model.hostname %>. <%= @model.type %>
+  <%- elsif @model.type == 'TXT' -%>
+update delete <%= @model.hostname %>. <%= @model.type %>
   <%- elsif @model.type == 'PTR' -%>
-update delete <%= @model.address %>. <%= @model.type %>        
+update delete <%= @model.address %>. <%= @model.type %>
   <%- end -%>
 <%- end -%>
-show 
+show
 send
 EOF
     def nsupdate(model)

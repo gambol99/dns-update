@@ -22,6 +22,14 @@ module DnsUpdate
       model
     end
 
+    def validate_update_txt(model)
+      check_hostname model.hostname
+      check_txt model.data
+      check_ttl model.ttl
+      model.zone = domain(model.hostname)
+      model
+    end
+
     def validate_update_reverse(model)
       check_hostname model.hostname
       check_address model.address
@@ -38,6 +46,12 @@ module DnsUpdate
     end
 
     def validate_remove_cname(model)
+      check_hostname model.hostname
+      model.zone = domain(model.hostname)
+      model
+    end
+
+    def validate_remove_txt(model)
       check_hostname model.hostname
       model.zone = domain(model.hostname)
       model

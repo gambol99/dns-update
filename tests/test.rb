@@ -36,6 +36,13 @@ dns.update { |m|
   m.cname = 'yum101.dasblinkenled.org'
 }
 
+announce "CHECK: adding a txt to the domain"
+dns.update { |m|
+  m.type = :txt
+  m.hostname = "yum101.dasblinkenled.org"
+  m.data = "some fun stuff"
+}
+
 # BROKEN
 if false
 announce 'CHECK: adding a reverse to the domain'
@@ -58,6 +65,12 @@ announce 'CHECK: removing a cname to the domain'
 dns.remove { |m|
   m.type = :cname
   m.hostname = 'yum.dasblinkenled.org'
+}
+
+announce "CHECK: removing a txt to the domain"
+dns.remove { |m|
+  m.type = :txt
+  m.hostname = "yum.domain.com"
 }
 
 if false

@@ -19,7 +19,7 @@ update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> <%= @mod
   <%- elsif @model.type == 'CNAME' -%>
 update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> <%= @model.cname %>
   <%- elsif @model.type == 'TXT' -%>
-update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> "<%= @model.data %>"
+update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> <%= @model.data %>
   <%- elsif @model.type == 'PTR' -%>
 update add <%= @model.address %> <%= @model.ttl %> <%= @model.type %> <%= @model.hostname %>
   <%- end -%>

@@ -38,6 +38,15 @@ dns.update { |m|
   m.ttl = 100
 }
 
+announce 'CHECK: adding a multi-part host to the domain, with zone set'
+dns.update { |m|
+  m.type = :record
+  m.zone     = 'dasblinkenled.org'
+  m.hostname = '_yum101.r.b.dasblinkenled.org'
+  m.address = '192.168.19.20'
+  m.ttl = 100
+}
+
 announce 'CHECK: adding a cname to the domain'
 dns.update { |m|
   m.type = :cname

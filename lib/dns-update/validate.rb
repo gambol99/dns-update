@@ -10,7 +10,7 @@ module DnsUpdate
       check_hostname model.hostname
       check_address model.address
       check_ttl model.ttl
-      model.zone = domain(model.hostname)
+      model.zone ||= domain(model.hostname)
       model
     end
 
@@ -18,7 +18,7 @@ module DnsUpdate
       check_hostname model.hostname
       check_cname model.cname
       check_ttl model.ttl
-      model.zone = domain(model.hostname)
+      model.zone ||= domain(model.hostname)
       model
     end
 
@@ -26,7 +26,7 @@ module DnsUpdate
       check_hostname model.hostname
       check_txt model.data
       check_ttl model.ttl
-      model.zone = domain(model.hostname)
+      model.zone ||= domain(model.hostname)
       model
     end
 
@@ -41,19 +41,19 @@ module DnsUpdate
 
     def validate_remove_record(model)
       check_hostname model.hostname
-      model.zone = domain(model.hostname)
+      model.zone ||= domain(model.hostname)
       model
     end
 
     def validate_remove_cname(model)
       check_hostname model.hostname
-      model.zone = domain(model.hostname)
+      model.zone ||= domain(model.hostname)
       model
     end
 
     def validate_remove_txt(model)
       check_hostname model.hostname
-      model.zone = domain(model.hostname)
+      model.zone ||= domain(model.hostname)
       model
     end
 

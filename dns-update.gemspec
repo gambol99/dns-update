@@ -12,8 +12,8 @@ Gem::Specification.new do |s|
   s.name        = 'dns-update'
   s.version     = DnsUpdate::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.date        = '2014-05-31'
-  s.authors     = ['Rohith Jayawardene']
+  s.date        = '2019-03-15'
+  s.authors     = ['Rohith Jayawardene', 'Michael Richardson']
   s.email       = 'gambol99@gmail.com'
   s.homepage    = 'http://rubygems.org/gems/dns-update'
   s.summary     = %q{A gem library used for dyanmic dns updates}

@@ -19,8 +19,12 @@ Gem::Specification.new do |s|
   s.summary     = %q{A gem library used for dyanmic dns updates}
   s.description = %q{Provides a ruby wrapper for nsupdates and dynamic dns}
   s.license     = 'MIT'
-  s.files       = `git ls-files`.split("\n")
-  s.test_files  = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.files       = [ '.gitignore', 'Gemfile', 'LICENSE', 'README.md', 'bin/.config.yaml',
+			'bin/dns', 'dns-update.gemspec', 'lib/dns-update.rb', 'lib/dns-update/dns.rb',
+			'lib/dns-update/error.rb', 'lib/dns-update/model.rb', 'lib/dns-update/nsupdate.rb',
+		       	'lib/dns-update/settings.rb', 'lib/dns-update/utils.rb', 'lib/dns-update/validate.rb',
+			'lib/dns-update/version.rb', 'tests/test.rb']
+  s.test_files  = [ 'tests/test.rb' ]
+  s.executables = [ 'dns' ]
   s.add_dependency 'netaddr'
 end

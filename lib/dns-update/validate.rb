@@ -14,6 +14,14 @@ module DnsUpdate
       model
     end
 
+    def validate_update_aaaa(model)
+      check_hostname model.hostname
+      check_address model.address
+      check_ttl model.ttl
+      model.zone ||= domain(model.hostname)
+      model
+    end
+
     def validate_update_cname(model)
       check_hostname model.hostname
       check_cname model.cname

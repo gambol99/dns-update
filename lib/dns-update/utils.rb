@@ -86,6 +86,8 @@ module DnsUpdate
     def types
       {
         :record => 'A',
+        :aaaa   => 'AAAA',
+        :record6 => 'AAAA',
         :cname  => 'CNAME',
         :reverse => 'PTR',
         :service => 'SRV',

@@ -16,6 +16,8 @@ zone <%= @model.zone %>.
 <%- if @model.operation == :update -%>
   <%- if @model.type == 'A' -%>
 update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> <%= @model.address %>
+  <%- elsif @model.type == 'AAAA' -%>
+update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> <%= @model.address %>
   <%- elsif @model.type == 'CNAME' -%>
 update add <%= @model.hostname %>. <%= @model.ttl %> <%= @model.type %> <%= @model.cname %>
   <%- elsif @model.type == 'TXT' -%>
@@ -25,6 +27,8 @@ update add <%= @model.address %> <%= @model.ttl %> <%= @model.type %> <%= @model
   <%- end -%>
 <%- else -%>
   <%- if @model.type == 'A' -%>
+update delete <%= @model.hostname %>. <%= @model.type %>
+  <%- elsif @model.type == 'AAAA' -%>
 update delete <%= @model.hostname %>. <%= @model.type %>
   <%- elsif @model.type == 'CNAME' -%>
 update delete <%= @model.hostname %>. <%= @model.type %>
@@ -50,7 +54,7 @@ EOF
       end
     end
 
-    private 
+    private
 
     def render_update(model)
       @model = model

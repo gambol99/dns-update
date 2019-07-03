@@ -11,7 +11,7 @@ module DnsUpdate
         options[x]
       end
     end
-  
+
     def settings
       @settings
     end

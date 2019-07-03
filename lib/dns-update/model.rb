@@ -7,8 +7,8 @@
 #
 module DnsUpdate
   class Model
-    attr_accessor :address, :domain, :zone, :hostname, :subnet 
-    attr_accessor :print_only, :ttl, :cname, :type, :operation
+    attr_accessor :address, :domain, :zone, :hostname, :subnet
+    attr_accessor :print_only, :ttl, :cname, :type, :operation, :data
 
     def initialize
       @print_only = false
